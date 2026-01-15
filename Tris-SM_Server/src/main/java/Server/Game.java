@@ -2,6 +2,7 @@ package Server;
 
 
 public class Game {
+	
     private char[][] board;
     private char currentPlayer;
     private boolean gameActive;
@@ -22,7 +23,11 @@ public class Game {
     }
 
     private void switchPlayer() {
-        
+        if(currentPlayer == 'X') {
+        	currentPlayer = 'O';
+        }
+        else
+        	currentPlayer = 'X';
     }
 
     private boolean checkWin(int r, int c) {
@@ -32,10 +37,17 @@ public class Game {
     private boolean isBoardFull() {
         
     }
+    
+    public void printBoard() {
+    	
+    }
+    
+    
 
     // Getters per il Server
     public char getCurrentPlayer() { return currentPlayer; }
     public boolean isGameActive() { return gameActive; }
     public String getWinner() { return winner; }
     public char[][] getBoard() { return board; }
+    
 }

@@ -31,7 +31,29 @@ public class Game {
     }
 
     private boolean checkWin(int r, int c) {
+    	
+    	char p = currentPlayer;
+    	
+    	// --Controllo per riga
+        if (board[r][0] == p && board[r][1] == p && board[r][2] == p) {
+        	return true;
+        }
         
+        // --Controllo per colonna
+        if (board[0][c] == p && board[1][c] == p && board[2][c] == p) {
+        	return true;
+        }
+        
+        // --Controllo della diagonale principale
+        if (r == c && board[0][0] == p && board[1][1] == p && board[2][2] == p) {
+        	return true;
+        }
+        // --Controllo della diagonale secondaria
+        if(r + c == 2 && board[2][0] == p && board [1][1] == p && board[0][2] == p) {
+        	return true;
+        }
+    	
+        return false;
     }
 
     private boolean isBoardFull() {

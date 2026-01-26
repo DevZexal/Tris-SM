@@ -19,7 +19,42 @@ public class Game {
     }
     
     public synchronized boolean makeMove(int row, int col) {
-        
+
+        // Partita già finita
+        if (!gameActive) {
+            return false;
+        }
+
+        // Coordinate fuori dalla griglia
+        if (row < 0 || row >= 3 || col < 0 || col >= 3) {
+            return false;
+        }
+
+        // Casella già occupata
+        if (board[row][col] != '-') {
+            return false;
+        }
+
+        // Effettua la mossa
+        board[row][col] = currentPlayer;
+
+        // Controllo vittoria
+        if (checkWin(row, col)) {
+            gameActive = false;
+            winner = String.valueOf(currentPlayer);
+            return true;
+        }
+
+        // Controllo pareggio
+        if (isBoardFull()) {
+            gameActive = false;
+            winner = "DRAW";
+            return true;
+        }
+
+        // Cambia giocatore
+        switchPlayer();
+        return true;
     }
 
     private void switchPlayer() {

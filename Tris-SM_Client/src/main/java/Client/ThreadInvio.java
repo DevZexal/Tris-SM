@@ -6,25 +6,30 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ThreadInvio implements Runnable {
+
     private Scanner sc;
     private PrintWriter out;
+    private volatile boolean puoInviare = true; // TRUE all'inizio
 
     public ThreadInvio(Socket socket) throws IOException {
         sc = new Scanner(System.in);
         out = new PrintWriter(socket.getOutputStream(), true);
     }
 
+    public void abilitaInvio() {
+        puoInviare = true;
+    }
+
     @Override
     public void run() {
         try {
             while (true) {
-                // Legge l'input dell'utente (scelta modalità o "r c")
                 if (sc.hasNextLine()) {
                     String message = sc.nextLine();
-                    out.println(message);
-                    
-                    if (message.equalsIgnoreCase("QUIT")) {
-                        break;
+
+                    if (puoInviare) {
+                        out.println(message);
+                        puoInviare = false;
                     }
                 }
             }

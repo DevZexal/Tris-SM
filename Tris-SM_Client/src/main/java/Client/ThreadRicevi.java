@@ -6,11 +6,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class ThreadRicevi implements Runnable {
+	private ThreadInvio invio;
     private BufferedReader in;
     private Socket socket;
 
-    public ThreadRicevi(Socket socket) throws IOException {
+    public ThreadRicevi(Socket socket, ThreadInvio invio) throws IOException {
         this.socket = socket;
+        this.invio = invio;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
@@ -31,6 +33,16 @@ public class ThreadRicevi implements Runnable {
                     System.out.println("***************************");
                     break; // Termina il ciclo
                 } 
+                else if (messaggio.equals("YOUR_TURN")) {
+                    System.out.println("\nÈ il tuo turno! Inserisci: r c");
+                    invio.abilitaInvio();
+                }
+                else if (messaggio.equals("YOUR_TURN")) {
+                    System.out.println("\nÈ il tuo turno! Inserisci: r c");
+                    invio.abilitaInvio();
+                }
+
+
                 else {
                     // Messaggi generici (es. "YOUR_TURN", "Mossa ok", "TRIS-SM")
                     System.out.println("\n[SERVER]: " + messaggio);

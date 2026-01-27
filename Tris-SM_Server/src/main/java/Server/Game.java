@@ -116,9 +116,8 @@ public class Game {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                sb.append(board[i][j]).append(" ");
+                sb.append(board[i][j]);
             }
-            sb.append("|");
         }
         return sb.toString();
     }

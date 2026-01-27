@@ -67,40 +67,51 @@ public class ThreadConnessione implements Runnable {
 
     private void gestisciPartitaPvP() throws IOException {
 
-        while (game.isGameActive()) {
+    while (game.isGameActive()) {
 
-            if (game.getCurrentPlayer() == mioSegno) {
+        if (game.getCurrentPlayer() == mioSegno) {
 
-                inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
-                inviaMessaggio("YOUR_TURN");
+            inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
+            inviaMessaggio("YOUR_TURN");
 
-                String mossa = in.readLine();
-                String[] coordinate = mossa.split(" ");
-                int r = Integer.parseInt(coordinate[0]);
-                int c = Integer.parseInt(coordinate[1]);
+            String mossa = in.readLine();
+            if (mossa == null) return; // client disconnesso
 
-                if (game.makeMove(r, c)) {
+            String[] coordinate = mossa.split(" ");
+            int r = Integer.parseInt(coordinate[0]);
+            int c = Integer.parseInt(coordinate[1]);
 
-                    avversario.inviaMessaggio("OPPONENT_MOVED " + r + " " + c);
+            if (game.makeMove(r, c)) {
 
-                    if (!game.isGameActive()) {
-                        String winner = game.getWinner();
+                String board = game.getBoardString();
+                inviaMessaggio("PRINT_BOARD: " + board);
+                avversario.inviaMessaggio("PRINT_BOARD: " + board);
+                avversario.inviaMessaggio("OPPONENT_MOVED " + r + " " + c);
 
-                        if (String.valueOf(mioSegno).equals(winner)) {
-                            inviaMessaggio("GAME_OVER Hai vinto!");
-                            avversario.inviaMessaggio("GAME_OVER Hai perso!");
-                        } else if ("DRAW".equals(winner)) {
-                            inviaMessaggio("GAME_OVER Pareggio");
-                            avversario.inviaMessaggio("GAME_OVER Pareggio");
-                        }
+                if (!game.isGameActive()) {
+                    String winner = game.getWinner();
+
+                    if (String.valueOf(mioSegno).equals(winner)) {
+                        inviaMessaggio("GAME_OVER Hai vinto!");
+                        avversario.inviaMessaggio("GAME_OVER Hai perso!");
+                    } else {
+                        inviaMessaggio("GAME_OVER Pareggio");
+                        avversario.inviaMessaggio("GAME_OVER Pareggio");
                     }
-
-                } else {
-                    inviaMessaggio("Mossa non valida");
                 }
+
+            } else {
+                inviaMessaggio("Mossa non valida");
             }
+
+        } else {
+            try {
+                Thread.sleep(50); // evita CPU 100%
+            } catch (InterruptedException ignored) {}
         }
     }
+}
+
 
     private void gestisciPartitaPvC() throws IOException {
         inviaMessaggio("Modalità PvC non ancora implementata");

@@ -12,12 +12,12 @@ public class ClientMain {
             Socket clientSocket = new Socket(IP, PORT);
             System.out.println("Connesso al server Tris-SM!");
 
-            Thread invio = new Thread(new ThreadInvio(clientSocket));
-            Thread ricevi = new Thread(new ThreadRicevi(clientSocket));
+            ThreadInvio invio = new ThreadInvio(clientSocket);
+            Thread ricevi = new Thread(new ThreadRicevi(clientSocket, invio));
 
-            // Impostiamo ricevi come prioritario per vedere subito i messaggi di benvenuto
+            new Thread(invio).start();
             ricevi.start();
-            invio.start();
+
 
         } catch (IOException e) {
             System.out.println("Impossibile connettersi al server su " + IP + ":" + PORT);

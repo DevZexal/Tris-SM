@@ -95,7 +95,7 @@ public class Game {
  
         for (int i = 0; i < 3; i++) {
         	for (int j = 0; j < 3; j++) {
-        		if (board[i][j]== '-') {
+        		if (board[i][j] == '-') {
         			return false;
         		}
         	}
@@ -111,6 +111,18 @@ public class Game {
     		System.out.println();
     	}
     }
+    
+    public String getBoardString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                sb.append(board[i][j]).append(" ");
+            }
+            sb.append("|");
+        }
+        return sb.toString();
+    }
+
     
     
 

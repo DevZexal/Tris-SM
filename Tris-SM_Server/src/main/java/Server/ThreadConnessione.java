@@ -40,12 +40,24 @@ public class ThreadConnessione implements Runnable {
     @Override
     public void run() {
         try {
-            inviaMessaggio("-------------");
-            inviaMessaggio("TRIS-SM");
-            inviaMessaggio("-------------");
-            inviaMessaggio("Scegli la modalita' di gioco");
-            inviaMessaggio("[0] Multi-player(PvP) [1] Single-Player(PvC)");
-
+        	inviaMessaggio("=================================");
+        	inviaMessaggio("        BENVENUTO IN TRIS-SM");
+        	inviaMessaggio("=================================");
+        	inviaMessaggio("GUIDA RAPIDA:");
+        	inviaMessaggio("- Il gioco si svolge su una griglia 3x3");
+        	inviaMessaggio("- Le righe e le colonne vanno da 0 a 2");
+        	inviaMessaggio("- Per fare una mossa scrivi: r c");
+        	inviaMessaggio("  Esempio: 1 2  (riga 1, colonna 2)");
+        	inviaMessaggio("- Se vuoi abbandonare la partita scrivi: EXIT");
+        	inviaMessaggio("");
+        	inviaMessaggio("MODALITA' DI GIOCO:");
+        	inviaMessaggio("[0] Multi-player (PvP)");
+        	inviaMessaggio("    → Giochi contro un altro giocatore online");
+        	inviaMessaggio("[1] Single-player (PvC)");
+        	inviaMessaggio("    → Giochi contro il computer");
+        	inviaMessaggio("");
+        	inviaMessaggio("Inserisci 0 o 1 e premi INVIO");
+        	inviaMessaggio("=================================");
             String scelta = in.readLine();
 
             if ("0".equals(scelta)) {
@@ -55,14 +67,20 @@ public class ThreadConnessione implements Runnable {
                 while (game == null) {
                     Thread.sleep(100);
                 }
-
+                
                 gestisciPartitaPvP();
             } else {
                 gestisciPartitaPvC();
             }
 
         } catch (Exception e) {
-            System.out.println("Connessione persa");
+            System.out.println("Connessione persa: " + client.getRemoteSocketAddress());
+        } finally {
+            try {
+                client.close();
+            } catch (IOException ignored) {}
+
+            listaClient.removeClient(client);
         }
     }
 
@@ -76,11 +94,29 @@ public class ThreadConnessione implements Runnable {
             inviaMessaggio("YOUR_TURN " + mioSegno);
 
             String mossa = in.readLine();
-            if (mossa == null) return; // client disconnesso
+            if (mossa == null || mossa.equalsIgnoreCase("EXIT")) {
+                inviaMessaggio("Hai abbandonato la partita.");
+                return;
+            }
 
-            String[] coordinate = mossa.split(" ");
-            int r = Integer.parseInt(coordinate[0]);
-            int c = Integer.parseInt(coordinate[1]);
+            String[] parti = mossa.trim().split(" ");
+            if (parti.length != 2) {
+                inviaMessaggio("Formato non valido. Usa: r c");
+                continue;
+            }
+
+            int r, c;
+            try {
+                r = Integer.parseInt(parti[0]);
+                c = Integer.parseInt(parti[1]);
+            } catch (NumberFormatException e) {
+                inviaMessaggio("Inserisci solo numeri da 0 a 2");
+                continue;
+            }
+
+            if (!game.makeMove(r, c)) {
+                inviaMessaggio("Mossa non valida. Riprova.");
+            }
 
             if (game.makeMove(r, c)) {
 
@@ -108,7 +144,7 @@ public class ThreadConnessione implements Runnable {
 
         } else {
             try {
-                Thread.sleep(50); // evita CPU 100%
+                Thread.sleep(50);
             } catch (InterruptedException ignored) {}
         }
     }
@@ -126,47 +162,62 @@ public class ThreadConnessione implements Runnable {
 
         while (game.isGameActive()) {
 
-            // TURNO UMANO
-            if (game.getCurrentPlayer() == mioSegno) {
+        	// TURNO UMANO
+		    if (game.getCurrentPlayer() == mioSegno) {
+		
+		        inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
+		        inviaMessaggio("YOUR_TURN " + mioSegno);
+		
+		        String mossa = in.readLine();
+		        if (mossa == null || mossa.equalsIgnoreCase("EXIT")) {
+		            inviaMessaggio("Hai abbandonato la partita.");
+		            inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
+		            return;
+		        }
+		
+		        String[] parti = mossa.trim().split(" ");
+		        if (parti.length != 2) {
+		            inviaMessaggio("Formato non valido. Usa: r c");
+		            continue;
+		        }
+		
+		        int r, c;
+		        try {
+		            r = Integer.parseInt(parti[0]);
+		            c = Integer.parseInt(parti[1]);
+		        } catch (NumberFormatException e) {
+		            inviaMessaggio("Inserisci solo numeri da 0 a 2");
+		            continue;
+		        }
+		
+		        if (!game.makeMove(r, c)) {
+		            inviaMessaggio("Mossa non valida. Riprova.");
+		            continue;
+		        }
+		
+		        inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
+		    }
+		
+		    // TURNO COMPUTER
+		    else {
+		        int[] bestMove = trovaMossaMigliore(game);
+		        game.makeMove(bestMove[0], bestMove[1]);
+		        inviaMessaggio("Il computer ha giocato: " + bestMove[0] + " " + bestMove[1]);
+		    }
+		
+		    // Controllo fine partita
+		    if (!game.isGameActive()) {
+		        String w = game.getWinner();
+		        if ("DRAW".equals(w)) {
+		            inviaMessaggio("GAME_OVER Pareggio");
+		        } else if (w.equals(String.valueOf(mioSegno))) {
+		            inviaMessaggio("GAME_OVER Hai vinto!");
+		        } else {
+		            inviaMessaggio("GAME_OVER Hai perso!");
+		        }
+		    }
+		}
 
-                inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
-                inviaMessaggio("YOUR_TURN " + mioSegno);
-
-                String mossa = in.readLine();
-                if (mossa == null) return;
-
-                String[] coord = mossa.split(" ");
-                int r = Integer.parseInt(coord[0]);
-                int c = Integer.parseInt(coord[1]);
-
-                if (!game.makeMove(r, c)) {
-                    inviaMessaggio("Mossa non valida");
-                    continue;
-                }
-
-            }
-            // TURNO COMPUTER
-            else {
-
-                int[] bestMove = trovaMossaMigliore(game);
-                game.makeMove(bestMove[0], bestMove[1]);
-
-                inviaMessaggio("Il computer ha giocato: " + bestMove[0] + " " + bestMove[1]);
-            }
-
-            inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
-
-            if (!game.isGameActive()) {
-                String w = game.getWinner();
-                if ("DRAW".equals(w)) {
-                    inviaMessaggio("GAME_OVER Pareggio");
-                } else if (w.equals(String.valueOf(mioSegno))) {
-                    inviaMessaggio("GAME_OVER Hai vinto!");
-                } else {
-                    inviaMessaggio("GAME_OVER Hai perso!");
-                }
-            }
-        }
     }
     
     private int[] trovaMossaMigliore(Game game) {

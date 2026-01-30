@@ -20,7 +20,8 @@ public class ThreadRicevi implements Runnable {
     public void run() {
         try {
             String messaggio;
-            while ((messaggio = in.readLine()) != null) {
+            while ((messaggio = in.readLine()) != null &&
+            	       !messaggio.equalsIgnoreCase("EXIT")) {
                 
                 if (messaggio.startsWith("PRINT_BOARD: ")) {
                     // Estrae la stringa della board (es. "X-O---X--")

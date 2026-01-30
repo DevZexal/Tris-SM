@@ -14,6 +14,26 @@ public class ListaClient {
 
     public synchronized void addClient(Socket client) {
         listaSockets.add(client);
+        stampaClientConnessi("NUOVA CONNESSIONE");
+    }
+    
+    public synchronized void removeClient(Socket client) {
+        listaSockets.remove(client);
+        stampaClientConnessi("DISCONNESSIONE");
+    }
+
+    private void stampaClientConnessi(String evento) {
+        System.out.println("\n==============================");
+        System.out.println("[" + evento + "]");
+        System.out.println("Client connessi: " + listaSockets.size());
+
+        for (int i = 0; i < listaSockets.size(); i++) {
+            Socket s = listaSockets.get(i);
+            System.out.println(
+                " #" + (i + 1) + " -> " + s.getRemoteSocketAddress()
+            );
+        }
+        System.out.println("==============================\n");
     }
 
     // Metodo che combina i player dalla lista dei client

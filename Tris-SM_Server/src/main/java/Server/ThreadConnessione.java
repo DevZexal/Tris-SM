@@ -17,6 +17,7 @@ public class ThreadConnessione implements Runnable {
     private Game game;
     private ThreadConnessione avversario;
     private char mioSegno;
+    private char oppSegno;
 
     public ThreadConnessione(Socket client, ListaClient listaClient) throws IOException {
         this.client = client;
@@ -72,7 +73,7 @@ public class ThreadConnessione implements Runnable {
         if (game.getCurrentPlayer() == mioSegno) {
 
             inviaMessaggio("PRINT_BOARD: " + game.getBoardString());
-            inviaMessaggio("YOUR_TURN");
+            inviaMessaggio("YOUR_TURN " + mioSegno);
 
             String mossa = in.readLine();
             if (mossa == null) return; // client disconnesso
@@ -86,7 +87,8 @@ public class ThreadConnessione implements Runnable {
                 String board = game.getBoardString();
                 inviaMessaggio("PRINT_BOARD: " + board);
                 avversario.inviaMessaggio("PRINT_BOARD: " + board);
-                avversario.inviaMessaggio("OPPONENT_MOVED " + r + " " + c);
+                
+                avversario.inviaMessaggio( mioSegno + " ha giocato " + r + " " + c);
 
                 if (!game.isGameActive()) {
                     String winner = game.getWinner();

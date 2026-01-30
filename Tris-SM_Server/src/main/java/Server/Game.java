@@ -127,6 +127,10 @@ public class Game {
 
     // Getters per il Server
     public char getCurrentPlayer() { return currentPlayer; }
+    public char getOpponentPlayer() {
+        return (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
     public boolean isGameActive() { return gameActive; }
     public String getWinner() { return winner; }
     public char[][] getBoard() { return board; }

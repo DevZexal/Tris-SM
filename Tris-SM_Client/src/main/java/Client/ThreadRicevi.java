@@ -29,19 +29,17 @@ public class ThreadRicevi implements Runnable {
                 } 
                 else if (messaggio.startsWith("GAME_OVER")) {
                     System.out.println("\n***************************");
-                    System.out.println("      " + messaggio);
+                    String formattedMessage = messaggio.replace("GAME_OVER", "");
+                    System.out.println("      " + formattedMessage);
                     System.out.println("***************************");
                     break; // Termina il ciclo
                 } 
-                else if (messaggio.equals("YOUR_TURN")) {
-                    System.out.println("\nÈ il tuo turno! Inserisci: r c");
+                else if (messaggio.startsWith("YOUR_TURN")) {
+                	String[] getOpp = messaggio.split(" ");
+                	
+                    System.out.println("\n" + getOpp[1] + " e' il tuo turno! Inserisci: r c");
                     invio.abilitaInvio();
                 }
-                else if (messaggio.equals("YOUR_TURN")) {
-                    System.out.println("\nÈ il tuo turno! Inserisci: r c");
-                    invio.abilitaInvio();
-                }
-
 
                 else {
                     // Messaggi generici (es. "YOUR_TURN", "Mossa ok", "TRIS-SM")

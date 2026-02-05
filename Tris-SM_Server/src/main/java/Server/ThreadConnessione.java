@@ -114,9 +114,6 @@ public class ThreadConnessione implements Runnable {
                 continue;
             }
 
-            if (!game.makeMove(r, c)) {
-                inviaMessaggio("Mossa non valida. Riprova.");
-            }
 
             if (game.makeMove(r, c)) {
 
